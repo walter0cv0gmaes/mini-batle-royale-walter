@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mini Jogo com Lobby e Coins</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #222; color: #eee; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0;}
+  #lobby, #game, #store { display: none; }
+  button { padding: 10px 20px; margin: 10px; font-size: 16px; cursor: pointer; }
+  input { padding: 10px; font-size: 16px; width: 200px; }
+  #playerBox { width: 100px; height: 100px; background: white; margin: 20px auto; border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <h2>Escolha seu nome</h2>
+  <input type="text" id="playerName" placeholder="Digite seu nome" maxlength="15" />
+  <button onclick="enterLobby()">Entrar na Lobby</button>
+</div>
+
+<div id="lobby">
+  <h2>Lobby</h2>
+  <p>Olá, <span id="displayName"></span>!</p>
+  <button onclick="startGame()">Iniciar Partida</button>
+  <button onclick="openStore()">Loja</button>
+  <p>Coins: <span id="coinsCount"></span></p>
+</div>
+
+<div id="store">
+  <h2>Loja de Skins</h2>
+  <p>Coins disponíveis: <span id="storeCoins"></span></p>
+  <button onclick="buySkin('red', 10)">Comprar Skin Vermelha (10 coins)</button>
+  <button onclick="buySkin('blue', 20)">Comprar Skin Azul (20 coins)</button>
+  <button onclick="buySkin('green', 30)">Comprar Skin Verde (30 coins)</button>
+  <button onclick="closeStore()">Voltar ao Lobby</button>
+</div>
+
+<div id="game">
+  <h2>Jogo Rodando</h2>
+  <p>Player: <span id="gamePlayerName"></span></p>
+  <div id="playerBox"></div>
+  <button onclick="endGame()">Terminar Partida</button>
+</div>
+
+<script>
+  let coins = parseInt(localStorage.getItem('coins')) || 0;
+  let playerName = '';
+  let currentSkin = localStorage.getItem('skin') || 'white';
+
+  document.getElementById('playerBox').style.backgroundColor = currentSkin;
+
+  function enterLobby() {
+    const input = document.getElementById('playerName');
+    if(input.value.trim().length < 1) {
+      alert('Digite um nome válido.');
+      return;
+    }
+    playerName = input.value.trim();
+    document.getElementById('displayName').textContent = playerName;
+    document.getElementById('coinsCount').textContent = coins;
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('lobby').style.display = 'block';
+  }
+
+  function startGame() {
+    document.getElementById('lobby').style.display = 'none';
+    document.getElementById('gamePlayerName').textContent = playerName;
+    document.getElementById('playerBox').style.backgroundColor = currentSkin;
+    document.getElementById('game').style.display = 'block';
+  }
+
+  function endGame() {
+    // Dar coins após partida (ex: 15)
+    coins += 15;
+    localStorage.setItem('coins', coins);
+    alert('Parabéns, você ganhou 15 coins!');
+    document.getElementById('game').style.display = 'none';
+    document.getElementById('coinsCount').textContent = coins;
+    document.getElementById('lobby').style.display = 'block';
+  }
+
+  function openStore() {
+    document.getElementById('lobby').style.display = 'none';
+    document.getElementById('storeCoins').textContent = coins;
+    document.getElementById('store').style.display = 'block';
+  }
+
+  function closeStore() {
+    document.getElementById('store').style.display = 'none';
+    document.getElementById('lobby').style.display = 'block';
+  }
+
+  function buySkin(color, price) {
+    if(coins < price) {
+      alert('Coins insuficientes!');
+      return;
+    }
+    coins -= price;
+    localStorage.setItem('coins', coins);
+    currentSkin = color;
+    localStorage.setItem('skin', currentSkin);
+    alert('Skin comprada com sucesso!');
+    document.getElementById('storeCoins').textContent = coins;
+  }
+</script>
+
+</body>
+</html>
